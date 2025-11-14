@@ -9,7 +9,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
 from config import Config
-from notion_client import NotionClient
+from notion_integration import NotionClient
 from pdf_filler import PDFFiller
 from email_sender import EmailSender
 

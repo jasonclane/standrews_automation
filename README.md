@@ -132,7 +132,7 @@ standrews_automation/
 ├── src/
 │   ├── __init__.py
 │   ├── config.py         # Configuration management
-│   ├── notion_client.py  # Notion API integration
+│   ├── notion_integration.py  # Notion API integration
 │   ├── pdf_filler.py     # PDF manipulation
 │   └── email_sender.py   # Email functionality
 ├── templates/            # PDF templates go here
