@@ -1,0 +1,12 @@
+# Notion API integration
+notion-client>=2.0.0
+
+# PDF manipulation
+PyPDF2>=3.0.0
+reportlab>=4.0.0
+
+# Email functionality
+python-dotenv>=1.0.0
+
+# HTTP requests
+requests>=2.31.0
