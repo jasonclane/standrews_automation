@@ -1,0 +1,59 @@
+name: Fill and Send Worship PDF
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Service date (YYYY-MM-DD)'
+        required: false
+      service_time:
+        description: 'Service time (e.g., 09:00 AM)'
+        required: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm i pdf-lib@1
+
+      - name: Override date/time (optional)
+        run: |
+          node -e "const fs=require('fs'); const p='data/this_week.json'; const d=JSON.parse(fs.readFileSync(p,'utf8')); if(process.env.DATE) d.date=process.env.DATE; if(process.env.TIME) d.service_time=process.env.TIME; fs.writeFileSync(p, JSON.stringify(d, null, 2));" 
+        env:
+          DATE: $ inputs.date 
+          TIME: $ inputs.service_time 
+
+      - name: Make output dir
+        run: mkdir -p pdfs/output
+
+      - name: Fill PDF
+        run: node scripts/fill_pdf.js
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: worship-pdf
+          path: pdfs/output/WorshipTeam_Filled.pdf
+
+      - name: Send email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: $ secrets.SMTP_HOST 
+          server_port: $ secrets.SMTP_PORT 
+          username: $ secrets.SMTP_USERNAME 
+          password: $ secrets.SMTP_PASSWORD 
+          subject: "Worship Team Schedule — $ inputs.date || fromJson(file('data/this_week.json')).date  $ inputs.service_time || fromJson(file('data/this_week.json')).service_time "
+          to: info@standrewsmckinney.org
+          from: $ secrets.MAIL_FROM 
+          secure: true
+          attachments: pdfs/output/WorshipTeam_Filled.pdf
